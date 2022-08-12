@@ -4,13 +4,13 @@
 //! which he graciously released into the public domain.
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod bytes;
-mod error;
+pub mod bytes;
+pub mod error;
 pub use error::HandshakeError;
-mod crypto;
+pub mod crypto;
 
 #[cfg(feature = "std")]
-mod util;
+pub mod util;
 
 #[cfg(feature = "std")]
 #[path = ""]

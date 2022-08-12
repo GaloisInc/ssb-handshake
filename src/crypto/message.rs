@@ -111,6 +111,15 @@ impl ClientAuth {
             ),
             ClientPublicKey(kp.public),
         );
+        Self::from_payload(payload, net_key, sa, sb)
+    }
+
+    pub fn from_payload(
+        payload: ClientAuthPayload,
+        net_key: &NetworkKey,
+        sa: &SharedA,
+        sb: &SharedB,
+    ) -> ClientAuth {
         let mut buf = [0; 96];
         buf.copy_from_slice(payload.as_bytes());
 
@@ -149,7 +158,7 @@ unsafe impl FromBytes for ClientAuth {
 
 #[derive(AsBytes)]
 #[repr(C)]
-struct ClientAuthSignData(NetworkKey, ServerPublicKey, SharedAHash);
+pub struct ClientAuthSignData(pub NetworkKey, pub ServerPublicKey, pub SharedAHash);
 
 fn client_auth_key(net_key: &NetworkKey, sa: &SharedA, sb: &SharedB) -> secretbox::Key {
     #[derive(AsBytes)]
@@ -161,7 +170,7 @@ fn client_auth_key(net_key: &NetworkKey, sa: &SharedA, sb: &SharedB) -> secretbo
 
 #[derive(AsBytes, FromBytes)]
 #[repr(C)]
-struct ClientAuthPayload(ClientSignature, ClientPublicKey);
+pub struct ClientAuthPayload(pub ClientSignature, pub ClientPublicKey);
 
 /// ## Message 4 (Server to Client)
 #[derive(AsBytes, FromBytes)]

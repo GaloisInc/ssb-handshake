@@ -9,7 +9,7 @@ use ssb_crypto::{hash, Hash, Keypair};
 /// Shared Secret A (client and server ephemeral keys)
 #[derive(AsBytes, Clone)]
 #[repr(C)]
-pub struct SharedA(SharedSecret);
+pub struct SharedA(pub SharedSecret);
 impl SharedA {
     // shared_secret_ab = nacl_scalarmult(
     //   client_ephemeral_sk,
@@ -33,12 +33,12 @@ impl SharedA {
 }
 #[derive(AsBytes)]
 #[repr(C)]
-pub(crate) struct SharedAHash(Hash);
+pub struct SharedAHash(pub Hash);
 
 /// Shared Secret B (client ephemeral key, server long-term key)
 #[derive(AsBytes, Clone)]
 #[repr(C)]
-pub struct SharedB(SharedSecret);
+pub struct SharedB(pub SharedSecret);
 impl SharedB {
     // shared_secret_aB = nacl_scalarmult(
     //   client_ephemeral_sk,
@@ -64,7 +64,7 @@ impl SharedB {
 /// Shared Secret C (client long-term key, server ephemeral key)
 #[derive(AsBytes, Clone)]
 #[repr(C)]
-pub struct SharedC(SharedSecret);
+pub struct SharedC(pub SharedSecret);
 impl SharedC {
     pub fn client_side(kp: &Keypair, pk: &ServerEphPublicKey) -> Option<SharedC> {
         // sk_to_curve(&sk.0)
