@@ -33,10 +33,13 @@ impl ClientHello {
     //   msg: client_ephemeral_pk,
     //   key: network_identifier)
     pub fn verify(&self, net_key: &NetworkKey) -> Option<ClientEphPublicKey> {
+        cc_trace!("ClientHello::verify");
         let ClientHello(hmac, eph_pk) = self;
         if net_key.verify(hmac, eph_pk.as_bytes()) {
+            cc_trace!("net_key.verify succeeded");
             Some(*eph_pk)
         } else {
+            cc_trace!("net_key.verify failed");
             None
         }
     }

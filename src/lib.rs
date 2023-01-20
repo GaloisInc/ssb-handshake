@@ -4,6 +4,30 @@
 //! which he graciously released into the public domain.
 #![cfg_attr(not(feature = "std"), no_std)]
 
+extern "C" {
+    fn __cc_trace(msg: *const u8);
+    fn __cc_trace_exec(
+        name: *const u8,
+        arg0: usize,
+        arg1: usize,
+        arg2: usize,
+        arg3: usize,
+    );
+}
+
+macro_rules! cc_trace {
+    ($msg:expr) => {
+        unsafe { crate::__cc_trace(concat!($msg, "\0").as_ptr()) }
+    };
+}
+
+macro_rules! cc_trace_exec {
+    ($msg:expr, $arg0:expr, $arg1:expr, $arg2:expr, $arg3:expr) => {
+        unsafe { crate::__cc_trace_exec(concat!($msg, "\0").as_ptr(), $arg0, $arg1, $arg2, $arg3) }
+    };
+}
+
+
 pub mod bytes;
 pub mod error;
 pub use error::HandshakeError;

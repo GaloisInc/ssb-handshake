@@ -8,6 +8,24 @@ use genio::{Read, Write};
 use ssb_crypto::ephemeral::{EphPublicKey, EphSecretKey};
 use ssb_crypto::{Keypair, NetworkKey};
 
+extern "C" {
+    fn __cc_trace(msg: *const u8);
+    fn __cc_trace_exec(
+        name: *const u8,
+        arg0: usize,
+        arg1: usize,
+        arg2: usize,
+        arg3: usize,
+    );
+}
+
+macro_rules! cc_trace {
+    ($msg:expr) => {
+        unsafe { __cc_trace(concat!($msg, "\0").as_ptr()) }
+    };
+}
+
+
 /// Perform the server side of the handshake using the given `AsyncRead + AsyncWrite` stream.
 /// Closes the stream on handshake failure.
 pub fn server_side<S, IoErr>(
@@ -23,10 +41,23 @@ where
 
     let (eph_pk, eph_sk) = (ServerEphPublicKey(eph_kp.0), ServerEphSecretKey(eph_kp.1));
 
+    for (i, &b) in eph_pk.0.0.iter().enumerate() {
+        cc_trace_exec!("eph_pk", i, b as usize, 0, 0);
+    }
+
+    for (i, &b) in eph_sk.0.0.iter().enumerate() {
+        cc_trace_exec!("eph_sk", i, b as usize, 0, 0);
+    }
+
+    cc_trace!("receiving eph pk");
     // Receive and verify client hello
     let client_eph_pk = {
         let mut buf = [0; size_of::<ClientHello>()];
         stream.read_exact(&mut buf)?;
+
+        for (i, &b) in buf.iter().enumerate() {
+            cc_trace_exec!("buf", i, b as usize, 0, 0);
+        }
         as_ref::<ClientHello>(&buf)
             .verify(&net_key)
             .ok_or(ClientHelloVerifyFailed)?
