@@ -41,6 +41,7 @@ where
 
     let (eph_pk, eph_sk) = (ServerEphPublicKey(eph_kp.0), ServerEphSecretKey(eph_kp.1));
 
+    /*
     for (i, &b) in eph_pk.0.0.iter().enumerate() {
         cc_trace_exec!("eph_pk", i, b as usize, 0, 0);
     }
@@ -48,6 +49,7 @@ where
     for (i, &b) in eph_sk.0.0.iter().enumerate() {
         cc_trace_exec!("eph_sk", i, b as usize, 0, 0);
     }
+    */
 
     cc_trace!("receiving eph pk");
     // Receive and verify client hello
@@ -55,9 +57,11 @@ where
         let mut buf = [0; size_of::<ClientHello>()];
         stream.read_exact(&mut buf)?;
 
+        /*
         for (i, &b) in buf.iter().enumerate() {
             cc_trace_exec!("buf", i, b as usize, 0, 0);
         }
+        */
         as_ref::<ClientHello>(&buf)
             .verify(&net_key)
             .ok_or(ClientHelloVerifyFailed)?
